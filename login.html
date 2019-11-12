@@ -1,0 +1,38 @@
+<html>
+<head>
+	<title>WICPS</title>
+	<meta charset="UTF-8">
+	<link href="http://fonts.googleapis.com/css?family=Titillium+Web:400,300,600" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nanum+Gothic">
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script src="login.js"></script>
+	<link rel="stylesheet" href="animate.css">
+	<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+	<div class="login_page">
+		<div class="login_page_tabs"><div class="switch_tab selected" id="a0">LOGIN</div><div class="switch_tab" id="a1">SIGN UP</div></div>
+		<div id="login_tab">   
+			<div class="login_title">WICPS<div class="welcome_message">Welcome! ☺</div></div>
+			<form id="login_form" method="post" autocomplete="on">
+				<input class="login_page_input" id="login_id" type="id" autocomplete="on" name="id" placeholder="ID">
+				<input class="login_page_input" id="login_pw" type="password" autocomplete="on" name="password" placeholder="PASSWORD">
+				<div class="login_page_button" id="login">LOGIN</div>
+			</form>
+			
+		</div>
+		<div id="signup_tab">	 
+			<div class="login_title">WICPS<div class="welcome_message">Sign up below!</div></div>
+			<form id="signup_form" action="index.php" method="post" autocomplete="off">
+				<input class="login_page_input" id="signup_id" type="id" autocomplete="off" name="id" placeholder="NEW ID">
+				<input class="login_page_input" id="signup_pw" type="password" autocomplete="off" name="password" placeholder="NEW PASSWORD">
+				<div class="login_page_button" id="signup">SIGN UP</div>
+			</form>
+			
+		</div>
+		<div class="show_message"></div>
+	</div>
+
+</body></html>
