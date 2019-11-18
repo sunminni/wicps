@@ -87,6 +87,7 @@ function setMessage(a, success=false){
 					$('.show_message').css('display','none');
 					if (success){
 						sessionStorage.setItem('id',success.id);
+						sessionStorage.setItem('is_developer',success.is_developer);
 						console.log(window.location.href.replace(window.location.pathname,'')+'/'+success.next);
 						window.location.href = window.location.href.replace(window.location.pathname,'')+'/'+success.next;
 					}
@@ -114,7 +115,7 @@ function validateLogin(){
 			success: function (result) {
 				if (result){
 					console.log("login success");
-					setMessage("Login success!",{id:ID,next:"index"});
+					setMessage("Login success!",{id:ID,is_developer:result.is_developer,next:"index"});
 				}
 				else{
 					console.log("login fail");

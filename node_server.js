@@ -95,7 +95,7 @@ app.use(function (req, res, next) {
 						else{
 							console.log("Login success!");
 							req.session.user = result.id;
-							res.send(true);
+							res.send(result);
 						}
 						res.end();
 						db.close();
