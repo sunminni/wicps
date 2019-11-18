@@ -56,6 +56,10 @@ function init_interface(){
 		validateSignup();
 	});
 
+	$('.developer_checkbox').on('click',function(){
+		$(this).toggleClass('clicked');
+	});
+
 	// Enter key for login/signup
 	$('.login_page_input').keypress(function(event){
 		if (event.which==13){
@@ -124,6 +128,7 @@ function validateLogin(){
 function validateSignup(){
 	var ID = $('#signup_id').val();
 	var PW = $('#signup_pw').val();
+	var is_developer = $('.developer_checkbox').hasClass('clicked');
 
 	if(ID.length<5){
 		setMessage('Please enter an ID (at least 5 characters).');
@@ -135,7 +140,7 @@ function validateSignup(){
 		$.ajax({
 			type: 'post',
 			url: '/signup',
-			data: {'id' : ID, 'password' : PW},
+			data: {'id' : ID, 'password' : PW, 'is_developer': is_developer},
 			success: function (result) {
 				if (result){
 					console.log("signup success");

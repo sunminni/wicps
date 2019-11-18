@@ -86,7 +86,7 @@ app.use(function (req, res, next) {
 				MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
 					if (err) throw err;
 					var dbo = db.db("mydb");
-					dbo.collection("userinfo").findOne({id: req_id, pw: req_pw},function(err, result) {
+					dbo.collection("userinfo").findOne(req.body,function(err, result) {
 						if (err) throw err;
 						if (result==null){
 							console.log("Login failed.");
@@ -120,19 +120,21 @@ app.use(function (req, res, next) {
 							MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
 								if (err) throw err;
 								var dbo = db.db("mydb");
-								dbo.collection("userinfo").insertOne({id: req_id, pw: req_pw},function(err, result) {
+								dbo.collection("userinfo").insertOne(req.body,function(err, result) {
 									if (err) throw err;
 									console.log("Sign up success!");
 									res.send(true);
+									res.end();
+									db.close();
 								});
 							});
 						}
 						else{
 							console.log("Sign up failed.");
 							res.send(false);
+							res.end();
+							db.close();
 						}
-						res.end();
-						db.close();
 					});
 				});
 				break;

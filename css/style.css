@@ -43,11 +43,12 @@ body{
 }
 /*LOGIN TAB*/
 .login_title{
-	height: 92px;
+	height: 52px;
 	font-size: 24px;
 	line-height: 48px;
 }
 .welcome_message{
+	height: 40px;
 	font-size: 18px;
 	line-height: 20px;
 }
@@ -91,6 +92,25 @@ body{
 }
 .all_signed_up{
 	font-size: 14px;
+}
+.developer_check{
+	height: 40px;
+	display: inline-block;
+	vertical-align: top;
+}
+.developer_checkbox{
+	height: 15px;
+	width: 15px;
+	border: 2px solid #30323D;
+	display: inline-block;
+	vertical-align: top;
+	margin-right: 10px;
+}
+.developer_checkbox:hover{
+	background-color: #a5a7ad;
+}
+.developer_checkbox.clicked{
+	background-color: #30323D;
 }
 
 /*INDEX*/
