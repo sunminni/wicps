@@ -8,8 +8,10 @@ var MongoClient = require('mongodb').MongoClient;
 var DB_URL = "mongodb://localhost:27017/";
 var url = require('url');
 const fs = require('fs');
+const fsExtra = require('fs-extra');
 
 //include JS folder
+app.use(express.static(__dirname));
 app.use(express.static(__dirname + '/js'));
 app.use(express.static(__dirname + '/css'));
 app.use(express.static(__dirname + '/sample'));
@@ -173,13 +175,18 @@ app.use(function (req, res, next) {
 				break;
 			case '/upload':
 				//create or overwrite files
-				fs.writeFile('sample/'+req.body.html_filename, req.body.html, (err) => {
+				if (!fs.existsSync(req.body.id)){
+				    fs.mkdirSync(req.body.id);
+				}
+				fsExtra.emptyDirSync(req.body.id);
+
+				fs.writeFile(req.body.id+'/'+req.body.html_filename, req.body.html, (err) => {
 					if (err) throw err;
 					console.log('html saved!');
-					fs.writeFile('sample/'+req.body.css_filename, req.body.css, (err) => {
+					fs.writeFile(req.body.id+'/'+req.body.css_filename, req.body.css, (err) => {
 						if (err) throw err;
 						console.log('css saved!');
-						fs.writeFile('sample/'+req.body.js_filename, req.body.js, (err) => {
+						fs.writeFile(req.body.id+'/'+req.body.js_filename, req.body.js, (err) => {
 							if (err) throw err;
 							console.log('js saved!');
 							res.send(true);

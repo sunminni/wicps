@@ -115,19 +115,19 @@ body{
 
 /*INDEX*/
 .page{
-	text-align: center;
+	text-align: left;
 	position: fixed;
 	top: 50px;
 	height: 645px;
+	font-size: 0;
 }
 
 .code{
-	width:32%;
 	height: 600px;
 	display: inline-block;
 	vertical-align: top;
-	padding-left: 5px;
-    padding-right: 5px;
+	padding-left: 10px;
+	font-size: 12px;
 }
 
 .code .header{
@@ -149,6 +149,34 @@ body{
 	text-align: right;
 }
 
+.checkbox{
+	height:20px;
+	width:60px;
+	margin-top: 10px;
+	vertical-align: top;
+	position: fixed;
+	font-family: sans-serif;
+    line-height: 20px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    border: 2px solid darkgray;
+    color: darkgray;
+    border-radius: 7px;
+    user-select: none;
+    text-align: center;
+}
+
+.btn:hover, .checkbox:hover{
+	border: 2px solid white;
+	color: white;
+}
+
+.btn.clicked, .checkbox.clicked{
+	border: 2px solid white;
+	color: white;
+	background-color: gray;
+}
+
 .btn{
 	height: 20px;
 	display: inline-block;
@@ -166,10 +194,6 @@ body{
     user-select: none;
 }
 
-.btn:hover, .btn.clicked{
-	border: 2px solid white;
-	color: white;
-}
 
 #versions{
 	width:200px;
@@ -236,4 +260,11 @@ body{
 	text-align: left;
 	margin-left: 10px;
 	background: #f0f0f0;
+}
+
+.waiting{
+	width: 100%;
+	text-align: center;
+	font-size: 15px;
+	font-family: sans-serif;
 }

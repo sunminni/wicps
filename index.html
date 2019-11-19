@@ -23,15 +23,21 @@
 </head>
 <body>
 	<div class='menu_bar'>
+		<div style="left:10px;" id='html_checkbox' class='checkbox clicked'>HTML</div>
+		<div style="left:80px;" id='css_checkbox' class='checkbox clicked'>CSS</div>
+		<div style="left:150px;" id='js_checkbox' class='checkbox clicked'>JS</div>
 		<div id='play_btn' class='btn'>▶</div>
+		<div id='connect_btn' class='btn'>CONNECT</div>
 		<div id='load_btn' class='btn'>LOAD</div>
 		<div id='save_btn' class='btn'>SAVE</div>
 		<div id='logout_btn' class='btn'>LOGOUT</div>
 	</div>
 	<div id='versions'></div>
 
+	<div class='waiting'></div>
+
 	<div class='iframe'>
-		<iframe id='iframeid' src='sample.html'></iframe>
+		<iframe id='iframeid'></iframe>
 	</div>
 
 	<div class='page'>
