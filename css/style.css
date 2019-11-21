@@ -268,3 +268,112 @@ body{
 	font-size: 15px;
 	font-family: sans-serif;
 }
+
+.chatting{
+	width: 200px;
+	height: 100%;
+	position: fixed;
+	right: 0;
+	top: 0;
+	display: block;
+	background-color: #d0d0d0;
+	text-align: left;
+	box-shadow: 8px 1px 15px 3px;
+}
+.chatting_placeholder{
+	width: 200px;
+	height: 50px;
+}
+
+.add_friend_btn{
+	width: 20px;
+	height: 20px;
+	font-size: 20px;
+	line-height: 20px;
+	font-family: sans-serif;
+	text-align: center;
+	margin: 5px;
+	padding: 5px;
+	border-radius: 5px;
+	color: darkgray;
+	background-color: #30323d;
+	display: inline-block;
+	user-select: none;
+}
+
+.add_friend_btn:hover{
+	color: white;
+}
+
+.add_friend_input{
+	height: 30px;
+	width: 155px;
+	font-size: 20px;
+	line-height: 20px;
+	display: inline-block;
+	border: none;
+}
+
+.chatting .message{
+	height: 30px;
+	width: 155px;
+	font-size: 13px;
+	line-height: 30px;
+	margin-top: 5px;
+	display: inline-block;
+	font-family: sans-serif;
+	font-weight: bold;
+	vertical-align: top;
+}
+
+.chat_log{
+	width: 200px;
+	height: 500px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	background-color: white;
+}
+.chat_log_designer{
+	width: 200px;
+	height: 550px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	background-color: white;
+}
+
+.chat_input{
+	width: 190px;
+	height: 90px;
+	margin: 5px;
+	padding: 5px;
+	resize: none;
+	font-size: 12px;
+}
+
+.single_chat{
+	width: 200px;
+	padding: 5px;
+	font-family: sans-serif;
+}
+
+.single_chat .ID{
+	font-weight: bold;
+	font-size: 13px;
+	height: 13px;
+	display: inline-block;
+}
+
+.single_chat .time_stamp{
+	font-size: 11px;
+	height: 13px;
+	display: inline-block;
+	margin-left: 5px;
+}
+
+.single_chat .msg{
+	font-size: 15px;
+	margin-left: 10px;
+	margin-top: 5px;
+	overflow-wrap: break-word;
+	width: 170px;
+}

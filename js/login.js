@@ -87,7 +87,7 @@ function setMessage(a, success=false){
 					$('.show_message').css('display','none');
 					if (success){
 						sessionStorage.setItem('id',success.id);
-						sessionStorage.setItem('is_developer',success.is_developer);
+						// sessionStorage.setItem('is_developer',success.is_developer);
 						console.log(window.location.href.replace(window.location.pathname,'')+'/'+success.next);
 						window.location.href = window.location.href.replace(window.location.pathname,'')+'/'+success.next;
 					}

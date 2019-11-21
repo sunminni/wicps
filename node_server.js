@@ -30,7 +30,7 @@ app.use(session({
 	resave: false,
 	saveUninitialized: false,
 	cookie: {
-		expires: 600000
+		expires: 60000000
 	}
 }));
 
@@ -46,7 +46,14 @@ app.use((req, res, next) => {
 // middleware function to check for logged-in users
 var sessionChecker = (req, res, next) => {
 	if (req.session.user && req.cookies.user_sid) {
-		res.sendFile(path.join(__dirname+'/index.html'));
+		console.log(req.session.is_developer);
+		if (req.session.is_developer=='true'){
+			// console.log('developer');
+			res.sendFile(path.join(__dirname+'/developer.html'));
+		}
+		else{
+			res.sendFile(path.join(__dirname+'/designer.html'));
+		}
 	} else {
 		next();
 	}    
@@ -97,6 +104,7 @@ app.use(function (req, res, next) {
 						else{
 							console.log("Login success!");
 							req.session.user = result.id;
+							req.session.is_developer = result.is_developer;
 							res.send(result);
 						}
 						res.end();
@@ -195,7 +203,86 @@ app.use(function (req, res, next) {
 					});
 				});
 				break;
-
+			case '/add_friend':
+				MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
+					if (err) throw err;
+					var dbo = db.db("mydb");
+					dbo.collection("userinfo").findOne({id:req.body.friend_id},function(err, result) {
+						if (err) throw err;
+						if (result==null){
+							//id does not exist
+							res.send(false);
+						}
+						else{
+							//request sent
+							res.send(true);
+							MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
+								if (err) throw err;
+								var dbo = db.db("mydb");
+								dbo.collection("add_requests").insertOne(req.body,function(err, result) {
+									if (err) throw err;
+								});
+							});
+						}
+					});
+				});
+				break;
+			case '/chat_upload':
+				MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
+					if (err) throw err;
+					var dbo = db.db("mydb");
+					dbo.collection("chat_log").insertOne(req.body,function(err, result) {
+						if (err) throw err;
+						if (result.result.ok){
+							MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
+								if (err) throw err;
+								var dbo = db.db("mydb");
+								dbo.collection("chat_log").find({host_id:req.body.host_id}).toArray(function(err, result) {
+									if (err) throw err;
+									res.send(result);
+									res.end();
+									db.close();
+								});
+							});
+						}
+						else{
+							res.send(false);
+							res.end();
+							db.close();
+						}
+					});
+				});
+				break;
+			case '/chat_download':
+				MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
+					if (err) throw err;
+					var dbo = db.db("mydb");
+					dbo.collection("chat_log").find(req.body).toArray(function(err, result) {
+						if (err) throw err;
+						res.send(result);
+						res.end();
+						db.close();
+					});
+				});
+				break;
+			case '/check_request':
+				MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
+					if (err) throw err;
+					var dbo = db.db("mydb");
+					dbo.collection("add_requests").findOne({friend_id:req.body.id},function(err, result) {
+						if (err) throw err;
+						if (result==null){
+							//request does not exist
+							res.send(false);
+						}
+						else{
+							//request exists
+							res.send(result);
+							dbo.collection("add_requests").deleteMany(result);
+						}
+					});
+				});
+				break;
 		}
 	}
 });
