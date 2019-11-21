@@ -185,6 +185,13 @@ app.use(function (req, res, next) {
 				}
 				fsExtra.emptyDirSync(req.body.id);
 
+				MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
+					if (err) throw err;
+					var dbo = db.db("mydb");
+					dbo.collection("userinfo").updateOne({id:req.body.id},{$set: {html_filename: req.body.html_filename}},{upsert:true});
+				});
+				
+
 				fs.writeFile(req.body.id+'/'+req.body.html_filename, req.body.html, (err) => {
 					if (err) throw err;
 					console.log('html saved!');
@@ -248,9 +255,14 @@ app.use(function (req, res, next) {
 					var dbo = db.db("mydb");
 					dbo.collection("chat_log").find(req.body).toArray(function(err, result) {
 						if (err) throw err;
-						res.send(result);
-						res.end();
-						db.close();
+						dbo.collection("userinfo").findOne({'id':req.body.host_id},function(err2, result2) {
+							if (err2) throw err2;
+							if (result2!=null){
+								res.send(result.concat([result2.html_filename]));
+								res.end();
+								db.close();
+							}
+						});
 					});
 				});
 				break;

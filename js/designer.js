@@ -121,6 +121,9 @@ function init_animation(){
 
 // 	$('.waiting').css('padding-top',window.innerHeight/2);
 // };
+function refresh_iframe(){
+	$('#iframeid').attr('src',sessionStorage.getItem('host_id')+'/'+sessionStorage.getItem('html_filename'));
+}
 
 function wait_for_request(){
 	var i = 0;
@@ -141,6 +144,8 @@ function wait_for_request(){
 					chat_upload('(joined the chatroom)');
 					$('.waiting').css('display','none');
 					$('.chatting').css('display','block');
+					$('.iframe').css('display','block');
+
 					$('#chat_btn').addClass('clicked');
 
 					clearInterval(loadingTimer);
@@ -157,6 +162,10 @@ function wait_for_request(){
 function readChatTimer(){
 	var i = 0;
 	loadingTimer = setInterval(function(){
+		if ($('#reload_btn').hasClass('clicked')){
+			refresh_iframe();
+		}
+
 		$.ajax({
 			type: 'post',
 			url: '/chat_download',
@@ -175,18 +184,23 @@ function readChatTimer(){
 }
 
 function load_chat(result){
-	if (result.length>0){
-		if (sessionStorage.getItem('chat_timestamp')==null || sessionStorage.getItem('chat_timestamp')!=result[result.length-1].timestamp){
+	if (result.length>1){
+		if (sessionStorage.getItem('chat_timestamp')==null || sessionStorage.getItem('chat_timestamp')!=result[result.length-2].timestamp){
 			$('.chat_log_designer').html('');
-			result.forEach(function(e){
-				var a  = new Date(0);
-				a.setUTCMilliseconds(e.timestamp);
-				var options = {hour:'2-digit', minute:'2-digit'};
-				var dateString = a.toLocaleString('en-US',options);
-				$('.chat_log_designer').append('<div class="single_chat"><div class="ID">'+e.id+'</div><div class="time_stamp">'+dateString+'</div><div class="msg">'+e.msg+'</div></div>');
-				$(".chat_log_designer").scrollTop($(".chat_log_designer")[0].scrollHeight);
+			result.forEach(function(e,i,array){
+				if (i==array.length-1){
+					sessionStorage.setItem('html_filename',e);
+				}
+				else{
+					var a  = new Date(0);
+					a.setUTCMilliseconds(e.timestamp);
+					var options = {hour:'2-digit', minute:'2-digit'};
+					var dateString = a.toLocaleString('en-US',options);
+					$('.chat_log_designer').append('<div class="single_chat"><div class="ID">'+e.id+'</div><div class="time_stamp">'+dateString+'</div><div class="msg">'+e.msg+'</div></div>');
+					$(".chat_log_designer").scrollTop($(".chat_log_designer")[0].scrollHeight);
+				}
 			});
-			sessionStorage.setItem('chat_timestamp',result[result.length-1].timestamp);
+			sessionStorage.setItem('chat_timestamp',result[result.length-2].timestamp);
 		}
 	}
 	else{
@@ -216,6 +230,8 @@ function chat_upload(chat_msg){
 $(document).ready(function(){
 	$('.waiting').html("Waiting for developer to connect...<br>");
 	$('.waiting').css('padding-top',$(window).height()/2);
+	$('.iframe').css('display','none');
+	$('.iframe').css('width',1080);
 	$('.code').css('display','none');
 	$('.chatting').css('display','none');
 
@@ -465,15 +481,22 @@ function init_buttons(){
 	// 	});
 	// });
 
+	$('#reload_btn').on('click',function(){
+		$(this).toggleClass('clicked');
+	});
+
 	$('#logout_btn').on('click',function(){
 		chat_upload('(exited the chatroom)');
 		window.location.href = window.location.href.replace(window.location.pathname,'')+'/logout';
 	});
+
 	$('#exit_btn').on('click',function(){
 		chat_upload('(exited the chatroom)');
+		clearInterval(loadingTimer);
 		sessionStorage.removeItem('chat_timestamp');
 		sessionStorage.removeItem('host_id');
 		$('.waiting').css('display','block');
+		$('.iframe').css('display','none');
 		$('.chatting').css('display','none');
 		$('#chat_btn').removeClass('clicked');
 		wait_for_request();

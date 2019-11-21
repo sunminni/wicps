@@ -244,24 +244,28 @@ function readChatTimer(){
 
 function load_chat(result){
 	if (result.length>0){
-		if (sessionStorage.getItem('chat_timestamp')==null||sessionStorage.getItem('chat_timestamp')!=result[result.length-1].timestamp){
+		if (sessionStorage.getItem('chat_timestamp')==null||sessionStorage.getItem('chat_timestamp')!=result[result.length-2].timestamp){
 			$('.chat_log').html('');
-			result.forEach(function(e){
-				var a  = new Date(0);
-				a.setUTCMilliseconds(e.timestamp);
-				var options = {hour:'2-digit', minute:'2-digit'};
-				var dateString = a.toLocaleString('en-US',options);
-				$('.chat_log').append('<div class="single_chat"><div class="ID">'+e.id+'</div><div class="time_stamp">'+dateString+'</div><div class="msg">'+e.msg+'</div></div>');
-				$(".chat_log").scrollTop($(".chat_log")[0].scrollHeight);
+			result.forEach(function(e,i,array){
+				if (i!=array.length-1){
+					var a  = new Date(0);
+					a.setUTCMilliseconds(e.timestamp);
+					var options = {hour:'2-digit', minute:'2-digit'};
+					var dateString = a.toLocaleString('en-US',options);
+					$('.chat_log').append('<div class="single_chat"><div class="ID">'+e.id+'</div><div class="time_stamp">'+dateString+'</div><div class="msg">'+e.msg+'</div></div>');
+					$(".chat_log").scrollTop($(".chat_log")[0].scrollHeight);
+				}
 			});
-			sessionStorage.setItem('chat_timestamp',result[result.length-1].timestamp);
+			sessionStorage.setItem('chat_timestamp',result[result.length-2].timestamp);
 		}
 	}
 }
 
 function coding_resize(){
+	$('.iframe').css('width',1280);
 	var b = [0,1260,625,413.3];
 	if ($('.chatting').css('display')=='block'){
+		$('.iframe').css('width',1080);
 		b = [0,1060,525,346.3];
 	}
 
