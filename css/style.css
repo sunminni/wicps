@@ -276,7 +276,7 @@ body{
 	right: 0;
 	top: 0;
 	display: block;
-	background-color: #d0d0d0;
+	background-color: #30323d;
 	text-align: left;
 	box-shadow: 8px 1px 15px 3px;
 }
@@ -285,40 +285,47 @@ body{
 	height: 50px;
 }
 
-.add_friend_btn{
-	width: 20px;
-	height: 20px;
-	font-size: 20px;
-	line-height: 20px;
+#add_friend_btn{
+	width: 50px;
+	height: 15px;
+	font-size: 10px;
+	line-height: 15px;
 	font-family: sans-serif;
 	text-align: center;
-	margin: 5px;
-	padding: 5px;
+	margin: 5px 5px 0 5px;
+	padding: 2px;
 	border-radius: 5px;
-	color: darkgray;
-	background-color: #30323d;
 	display: inline-block;
 	user-select: none;
 }
 
-.add_friend_btn:hover{
-	color: white;
-}
 
 .add_friend_input{
-	height: 30px;
-	width: 155px;
-	font-size: 20px;
-	line-height: 20px;
+	height: 20px;
+	width: 120px;
+	font-size: 12px;
+	line-height: 15px;
 	display: inline-block;
 	border: none;
+	padding-left: 3px;
+	padding-right: 3px;
+}
+
+.controls .btn{
+	font-size: 10px;
+	padding: 2px;
+	margin: 5px 0 5px 6px;
+	width: 50px;
+	height: 15px;
+	line-height: 15px;
+	text-align: center;
 }
 
 .chatting .message{
-	height: 30px;
-	width: 155px;
-	font-size: 13px;
-	line-height: 30px;
+	height: 20px;
+	width: 120px;
+	font-size: 10px;
+	line-height: 20px;
 	margin-top: 5px;
 	display: inline-block;
 	font-family: sans-serif;
@@ -328,14 +335,14 @@ body{
 
 .chat_log{
 	width: 200px;
-	height: 500px;
+	height: 485px;
 	overflow-y: scroll;
 	overflow-x: hidden;
 	background-color: white;
 }
 .chat_log_designer{
 	width: 200px;
-	height: 550px;
+	height: 490px;
 	overflow-y: scroll;
 	overflow-x: hidden;
 	background-color: white;

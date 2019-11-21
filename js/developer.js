@@ -382,14 +382,15 @@ function init_buttons(){
 		coding_resize();
 	});
 
-	$('.add_friend_btn').on('click',function(){
+	$('#add_friend_btn').on('click',function(){
+		$(this).addClass('clicked');
 		$(this).after('<input type="text" class="add_friend_input" maxlength="20"></input>');
 		$('.message').remove();
 		$('.add_friend_input').focus();
 		$('.add_friend_input').focusout(function(){
 			var friend_id = $(this).val();
 			if (friend_id==sessionStorage.getItem('id')){
-				$(this).after('<div style="color:red" class="message">(Cannot add yourself!)</div>');
+				$(this).after('<div style="color:red" class="message">(Can\'t add yourself)</div>');
 				$(this).remove();
 			}
 			else if (friend_id!=''){
@@ -400,10 +401,10 @@ function init_buttons(){
 							friend_id: friend_id},
 					success: function (result) {
 						if (result){
-							$('.add_friend_input').after('<div class="message">(Invitation sent!)</div>');
+							$('.add_friend_input').after('<div style="color:white" class="message">(Invitation sent)</div>');
 						}
 						else{
-							$('.add_friend_input').after('<div style="color:red" class="message">(ID does not exist!)</div>');
+							$('.add_friend_input').after('<div style="color:red" class="message">(ID does not exist)</div>');
 						}
 						$('.add_friend_input').remove();
 					}
@@ -411,6 +412,7 @@ function init_buttons(){
 			}
 			else{
 				$(this).remove();
+				$('#add_friend_btn').removeClass('clicked');
 			}
 		});
 		$('.add_friend_input').keydown(function(e){
