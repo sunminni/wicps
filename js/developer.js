@@ -243,17 +243,19 @@ function readChatTimer(){
 }
 
 function load_chat(result){
-	if (sessionStorage.getItem('chat_timestamp')==null||sessionStorage.getItem('chat_timestamp')!=result[result.length-1].timestamp){
-		$('.chat_log').html('');
-		result.forEach(function(e){
-			var a  = new Date(0);
-			a.setUTCMilliseconds(e.timestamp);
-			var options = {hour:'2-digit', minute:'2-digit'};
-			var dateString = a.toLocaleString('en-US',options);
-			$('.chat_log').append('<div class="single_chat"><div class="ID">'+e.id+'</div><div class="time_stamp">'+dateString+'</div><div class="msg">'+e.msg+'</div></div>');
-			$(".chat_log").scrollTop($(".chat_log")[0].scrollHeight);
-		});
-		sessionStorage.setItem('chat_timestamp',result[result.length-1].timestamp);
+	if (result.length>0){
+		if (sessionStorage.getItem('chat_timestamp')==null||sessionStorage.getItem('chat_timestamp')!=result[result.length-1].timestamp){
+			$('.chat_log').html('');
+			result.forEach(function(e){
+				var a  = new Date(0);
+				a.setUTCMilliseconds(e.timestamp);
+				var options = {hour:'2-digit', minute:'2-digit'};
+				var dateString = a.toLocaleString('en-US',options);
+				$('.chat_log').append('<div class="single_chat"><div class="ID">'+e.id+'</div><div class="time_stamp">'+dateString+'</div><div class="msg">'+e.msg+'</div></div>');
+				$(".chat_log").scrollTop($(".chat_log")[0].scrollHeight);
+			});
+			sessionStorage.setItem('chat_timestamp',result[result.length-1].timestamp);
+		}
 	}
 }
 
@@ -390,7 +392,10 @@ function init_buttons(){
 		$('.add_friend_input').focusout(function(){
 			var friend_id = $(this).val();
 			if (friend_id==sessionStorage.getItem('id')){
-				$(this).after('<div style="color:red" class="message">(Can\'t add yourself)</div>');
+				$(this).after('<div style="color:red" class="message">(Unable to add yourself)</div>');
+				setTimeout(function(){
+					$('.message').remove();
+				},2000);
 				$(this).remove();
 			}
 			else if (friend_id!=''){
@@ -406,6 +411,9 @@ function init_buttons(){
 						else{
 							$('.add_friend_input').after('<div style="color:red" class="message">(ID does not exist)</div>');
 						}
+						setTimeout(function(){
+							$('.message').remove();
+						},2000);
 						$('.add_friend_input').remove();
 					}
 				});
@@ -417,11 +425,21 @@ function init_buttons(){
 		});
 		$('.add_friend_input').keydown(function(e){
 			if (e.which==13){
+				$('#add_friend_btn').removeClass('clicked');
 				$(this).blur();
 			}
 			else if (e.which==32){
 				return false;
 			}
+		});
+	});
+
+	$('#clear_btn').on('click',function(){
+		$('.chat_log').html('');
+		$.ajax({
+			type: 'post',
+			url: '/clear_chat',
+			data: {	host_id: sessionStorage.getItem('id')}
 		});
 	});
 

@@ -147,6 +147,7 @@ body{
 	background: #30323D;
 	z-index: 20;
 	text-align: right;
+	box-shadow: -3px -3px 10px 5px;
 }
 
 .checkbox{
@@ -284,6 +285,23 @@ body{
 	width: 200px;
 	height: 50px;
 }
+#clear_btn, #exit_btn{
+	height: 10px;
+	font-size: 8px;
+	font-family: sans-serif;
+	color: white;
+	background-color: #F25F5C;
+	text-align: center;
+	margin: 3px;
+	position: fixed;
+	right: 0;
+	padding: 4px;
+	border-radius: 8px;
+	user-select: none;
+}
+#clear_btn:hover, #exit_btn:hover{
+	opacity: 0.8;
+}
 
 #add_friend_btn{
 	width: 50px;
@@ -294,7 +312,6 @@ body{
 	text-align: center;
 	margin: 5px 5px 0 5px;
 	padding: 2px;
-	border-radius: 5px;
 	display: inline-block;
 	user-select: none;
 }
@@ -331,6 +348,7 @@ body{
 	font-family: sans-serif;
 	font-weight: bold;
 	vertical-align: top;
+	user-select: none;
 }
 
 .chat_log{
@@ -342,7 +360,7 @@ body{
 }
 .chat_log_designer{
 	width: 200px;
-	height: 490px;
+	height: 513px;
 	overflow-y: scroll;
 	overflow-x: hidden;
 	background-color: white;

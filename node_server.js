@@ -127,17 +127,14 @@ app.use(function (req, res, next) {
 					dbo.collection("userinfo").findOne({id: req_id},function(err, result) {
 						if (err) throw err;
 						if (result==null){
-							MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
+							dbo.collection("userinfo").insertOne(req.body,function(err, result) {
 								if (err) throw err;
-								var dbo = db.db("mydb");
-								dbo.collection("userinfo").insertOne(req.body,function(err, result) {
-									if (err) throw err;
-									console.log("Sign up success!");
-									res.send(true);
-									res.end();
-									db.close();
-								});
+								console.log("Sign up success!");
+								res.send(true);
+								res.end();
+								db.close();
 							});
+
 						}
 						else{
 							console.log("Sign up failed.");
@@ -216,13 +213,7 @@ app.use(function (req, res, next) {
 						else{
 							//request sent
 							res.send(true);
-							MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
-								if (err) throw err;
-								var dbo = db.db("mydb");
-								dbo.collection("add_requests").insertOne(req.body,function(err, result) {
-									if (err) throw err;
-								});
-							});
+							dbo.collection("add_requests").updateOne(req.body,{$set: req.body},{upsert:true});
 						}
 					});
 				});
@@ -233,24 +224,22 @@ app.use(function (req, res, next) {
 					var dbo = db.db("mydb");
 					dbo.collection("chat_log").insertOne(req.body,function(err, result) {
 						if (err) throw err;
+						if (req.body.msg == '(exited the chatroom)'){
+							dbo.collection("add_requests").deleteOne({friend_id:req.body.id});
+						}
 						if (result.result.ok){
-							MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
+							dbo.collection("chat_log").find({host_id:req.body.host_id}).toArray(function(err, result) {
 								if (err) throw err;
-								var dbo = db.db("mydb");
-								dbo.collection("chat_log").find({host_id:req.body.host_id}).toArray(function(err, result) {
-									if (err) throw err;
-									res.send(result);
-									res.end();
-									db.close();
-								});
+								res.send(result);
+								res.end();
 							});
 						}
 						else{
 							res.send(false);
 							res.end();
-							db.close();
 						}
 					});
+					
 				});
 				break;
 			case '/chat_download':
@@ -278,9 +267,15 @@ app.use(function (req, res, next) {
 						else{
 							//request exists
 							res.send(result);
-							dbo.collection("add_requests").deleteMany(result);
 						}
 					});
+				});
+				break;
+			case '/clear_chat':
+				MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
+					if (err) throw err;
+					var dbo = db.db("mydb");
+					dbo.collection("chat_log").deleteMany({host_id:req.body.host_id});
 				});
 				break;
 		}
