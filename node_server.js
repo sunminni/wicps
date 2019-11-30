@@ -6,6 +6,7 @@ const app = express();
 const path = require('path');
 var MongoClient = require('mongodb').MongoClient;
 var DB_URL = "mongodb://localhost:27017/";
+var https = require('https');
 var url = require('url');
 const fs = require('fs');
 const fsExtra = require('fs-extra');
@@ -46,7 +47,7 @@ app.use((req, res, next) => {
 // middleware function to check for logged-in users
 var sessionChecker = (req, res, next) => {
 	if (req.session.user && req.cookies.user_sid) {
-		console.log(req.session.is_developer);
+		//console.log(req.session.is_developer);
 		if (req.session.is_developer=='true'){
 			// console.log('developer');
 			res.sendFile(path.join(__dirname+'/developer.html'));
@@ -88,9 +89,9 @@ app.use(function (req, res, next) {
 				var req_id = req.body.id;
 				var req_pw = req.body.password;
 				// do something
-				console.log('client attempts to login');
-				console.log('id: '+req_id);
-				console.log('pw: '+req_pw);
+				// console.log('client attempts to login');
+				// console.log('id: '+req_id);
+				// console.log('pw: '+req_pw);
 
 				MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
 					if (err) throw err;
@@ -117,9 +118,9 @@ app.use(function (req, res, next) {
 				var req_id = req.body.id;
 				var req_pw = req.body.password;
 				// do something
-				console.log('client attempts to signup');
-				console.log('id: '+req_id);
-				console.log('pw: '+req_pw);
+				// console.log('client attempts to signup');
+				// console.log('id: '+req_id);
+				// console.log('pw: '+req_pw);
 
 				MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
 					if (err) throw err;
@@ -152,11 +153,11 @@ app.use(function (req, res, next) {
 					dbo.collection("versions").insertOne(req.body,function(err, result) {
 						if (err) throw err;
 						if (result.result.ok){
-							console.log("save success!");
+							console.log("Save success!");
 							res.send(true);
 						}
 						else{
-							console.log("save failed.");
+							console.log("Save failed.");
 							res.send(false);
 						}
 						res.end();
@@ -194,13 +195,14 @@ app.use(function (req, res, next) {
 
 				fs.writeFile(req.body.id+'/'+req.body.html_filename, req.body.html, (err) => {
 					if (err) throw err;
-					console.log('html saved!');
+					// console.log('html saved!');
 					fs.writeFile(req.body.id+'/'+req.body.css_filename, req.body.css, (err) => {
 						if (err) throw err;
-						console.log('css saved!');
+						// console.log('css saved!');
 						fs.writeFile(req.body.id+'/'+req.body.js_filename, req.body.js, (err) => {
 							if (err) throw err;
-							console.log('js saved!');
+							// console.log('js saved!');
+							console.log('html, css, js saved!');
 							res.send(true);
 							res.end();
 						});
@@ -211,6 +213,7 @@ app.use(function (req, res, next) {
 				MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
 					if (err) throw err;
 					var dbo = db.db("mydb");
+					//console.log(req.body.pc);
 					dbo.collection("userinfo").findOne({id:req.body.friend_id},function(err, result) {
 						if (err) throw err;
 						if (result==null){
@@ -220,7 +223,9 @@ app.use(function (req, res, next) {
 						else{
 							//request sent
 							res.send(true);
-							dbo.collection("add_requests").updateOne(req.body,{$set: req.body},{upsert:true});
+							var query = {	host_id: req.body.host_id,
+											friend_id: req.body.friend_id};
+							dbo.collection("add_requests").updateOne(query,{$set: req.body},{upsert:true});
 						}
 					});
 				});
@@ -270,8 +275,10 @@ app.use(function (req, res, next) {
 				MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
 					if (err) throw err;
 					var dbo = db.db("mydb");
+
 					dbo.collection("add_requests").findOne({friend_id:req.body.id},function(err, result) {
 						if (err) throw err;
+
 						if (result==null){
 							//request does not exist
 							res.send(false);
@@ -295,6 +302,10 @@ app.use(function (req, res, next) {
 });
 
 //start server: listen to port 3000!
-app.listen(process.env.port || 3000);
+https.createServer({
+    key: fs.readFileSync('./key.pem'),
+    cert: fs.readFileSync('./cert.pem'),
+    passphrase: 'asdfasdf'
+},app).listen(process.env.port || 3000);
 
 console.log('Running at Port 3000');

@@ -4,10 +4,32 @@ var js_CodeMirror;
 
 var codes;
 var loadingTimer;
-// function post_link(){
-// 	var link = $($('.togetherjs-share-link')[0]).val();
-// 	return link;
-// }
+var peer;
+var mediaStream;
+
+function initPeerJS(){
+	navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(function(MS){
+		mediaStream = MS;
+	});
+
+	peer = new Peer({key: 'lwjd5qra8257b9'});
+	peer.on('open', function(peer_id) {
+		console.log('My peer ID is: ' + peer_id);
+		sessionStorage.setItem('peer_id',peer_id);
+	});
+}
+
+function call(){
+	console.log(mediaStream);
+	console.log(sessionStorage.getItem('host_peer_id'),sessionStorage.getItem('peer_id'));
+	var call = peer.call(sessionStorage.getItem('host_peer_id'),mediaStream);
+	call.on('stream', function(stream) {
+		video = $('#remoteVideo')[0];
+		video.srcObject = stream;
+	});
+}
+
+					
 
 // function load_codes(){
 // 	var id_info = {id: sessionStorage.getItem('id')};
@@ -138,6 +160,7 @@ function wait_for_request(){
 			data: {	id: sessionStorage.getItem('id') },
 			success: function (result) {
 				if (result){
+					clearInterval(loadingTimer);
 					console.log("chat join success.");
 					console.log(result);
 					sessionStorage.setItem('host_id',result.host_id);
@@ -145,10 +168,10 @@ function wait_for_request(){
 					$('.waiting').css('display','none');
 					$('.chatting').css('display','block');
 					$('.iframe').css('display','block');
-
 					$('#chat_btn').addClass('clicked');
 
-					clearInterval(loadingTimer);
+					sessionStorage.setItem('host_peer_id',result.peer_id);
+
 					readChatTimer();
 				}
 				else{
@@ -265,10 +288,6 @@ $(document).ready(function(){
 	
 	// load_codes();
 	
-	// TogetherJS(this);
-	//$('#togetherjs-share').css('display','none');
-
-
 	// $('.filename').on('click',function(){
 	// 	var filename = $(this).text().split(".")[0];
 	// 	var filetype = $(this).text().split(".")[1];
@@ -313,6 +332,7 @@ $(document).ready(function(){
 		}
 	});
 
+	initPeerJS();
 });
 
 // function coding_resize(){
@@ -480,6 +500,9 @@ function init_buttons(){
 	// 		}
 	// 	});
 	// });
+	$('#mic_btn').on('click',function(){
+		call();
+	});
 
 	$('#reload_btn').on('click',function(){
 		$(this).toggleClass('clicked');

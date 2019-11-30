@@ -4,10 +4,28 @@ var js_CodeMirror;
 
 var codes;
 var loadingTimer;
+var peer;
+var mediaStream;
 
-function post_link(){
-	var link = $($('.togetherjs-share-link')[0]).val();
-	return link;
+function initPeerJS(){
+	navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(function(MS){
+		mediaStream = MS;
+	});
+	peer = new Peer({key: 'lwjd5qra8257b9'});
+	peer.on('open', function(peer_id) {
+		console.log('My peer ID is: ' + peer_id);
+		sessionStorage.setItem('peer_id',peer_id);
+	});
+	peer.on('call', function(call) {
+		console.log('answered!');
+		call.answer(mediaStream);
+		
+		call.on('stream', function(stream) {
+			video = $('#localVideo')[0];
+			video.srcObject = stream;
+		});
+	});
+	
 }
 
 function load_codes(){
@@ -122,10 +140,9 @@ window.onresize = function(event) {
 
 	$('.waiting').css('padding-top',window.innerHeight/2);
 };
-var PC;
+
 $(document).ready(function(){
-	PC = new RTCPeerConnection();
-	console.log(PC.connectionState);
+
 	init_animation();
 
 	var settings = {	lineWrapping: true,
@@ -152,10 +169,6 @@ $(document).ready(function(){
 	
 	load_codes();
 	
-	// TogetherJS(this);
-	//$('#togetherjs-share').css('display','none');
-
-
 	$('.filename').on('click',function(){
 		var filename = $(this).text().split(".")[0];
 		var filetype = $(this).text().split(".")[1];
@@ -219,6 +232,7 @@ $(document).ready(function(){
 	sessionStorage.setItem('host_id',sessionStorage.getItem('id'));
 	sessionStorage.removeItem('chat_timestamp');
 
+	initPeerJS();
 });
 
 
@@ -393,7 +407,7 @@ function init_buttons(){
 		$(this).after('<input type="text" class="add_friend_input" maxlength="20"></input>');
 		$('.message').remove();
 		$('.add_friend_input').focus();
-		$('.add_friend_input').focusout(function(){
+		$('.add_friend_input').focusout(async function(){
 			var friend_id = $(this).val();
 			if (friend_id==sessionStorage.getItem('id')){
 				$(this).after('<div style="color:red" class="message">(Unable to add yourself)</div>');
@@ -407,7 +421,8 @@ function init_buttons(){
 					type: 'post',
 					url: '/add_friend',
 					data: {	host_id: sessionStorage.getItem('id'),
-							friend_id: friend_id},
+							friend_id: friend_id,
+							peer_id: sessionStorage.getItem('peer_id')},
 					success: function (result) {
 						if (result){
 							$('.add_friend_input').after('<div style="color:white" class="message">(Invitation sent)</div>');
@@ -453,3 +468,4 @@ function init_buttons(){
 	});
 
 }
+

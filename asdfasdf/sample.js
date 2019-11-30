@@ -4,7 +4,6 @@ var i=0;
 var j=0;
 
 $(document).ready(function(){
-  
   $('#mario1').attr('src','https://i.ibb.co/SRQct6N/mario1.png');
   $('#mario2').attr('src','https://i.ibb.co/MGd5djn/mario2.png');
   $('#mario3').attr('src','https://i.ibb.co/fq4ycxB/mario3.png');
