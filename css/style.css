@@ -355,14 +355,14 @@ body{
 
 .chat_log{
 	width: 200px;
-	height: 485px;
+	height: 425px;
 	overflow-y: scroll;
 	overflow-x: hidden;
 	background-color: white;
 }
 .chat_log_designer{
 	width: 200px;
-	height: 513px;
+	height: 453px;
 	overflow-y: scroll;
 	overflow-x: hidden;
 	background-color: white;
@@ -403,4 +403,44 @@ body{
 	margin-top: 5px;
 	overflow-wrap: break-word;
 	width: 170px;
+}
+
+.room_info{
+	height: 60px;
+	width: 210px;
+	background-color: #f0f0f0;
+	line-height: 0;
+}
+
+.host_info{
+	height: 16px;
+	line-height: 16px;
+	width: 190px;
+	padding: 5px;
+	font-size: 16px;
+	text-align: center;
+	font-family: sans-serif;
+}
+
+.member_info{
+	float: left;
+	height: 12px;
+	line-height: 12px;
+	width: 95px;
+	padding: 2.5px;
+	font-size: 11px;
+	display: inline-block;
+	text-align: left;
+	font-family: sans-serif;
+	vertical-align: top;
+}
+
+.mic_icon, .speaker_icon{
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	font-size: 10px;
+	vertical-align: top;
+	border-radius: 7px;
+	background: gray;
 }

@@ -250,6 +250,7 @@ function chat_upload(chat_msg){
 	});
 }
 
+
 $(document).ready(function(){
 	$('.waiting').html("Waiting for developer to connect...<br>");
 	$('.waiting').css('padding-top',$(window).height()/2);
