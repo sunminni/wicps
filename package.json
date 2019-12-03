@@ -1,0 +1,19 @@
+{
+  "name": "wicps",
+  "version": "1.0.0",
+  "description": "WICPS for 2019 Fall CS554",
+  "main": "node_server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sunminni/wicps.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sunminni/wicps/issues"
+  },
+  "homepage": "https://github.com/sunminni/wicps#readme"
+}
