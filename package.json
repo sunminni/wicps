@@ -26,6 +26,7 @@
     "ee-first": "1.1.1",
     "express": "^4.17.1",
     "express-session": "^1.17.0",
+    "formidable": "^1.2.1",
     "fs-extra": "^8.1.0",
     "http-errors": "1.7.2",
     "iconv-lite": "0.4.24",

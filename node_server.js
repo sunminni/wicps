@@ -10,6 +10,7 @@ var https = require('https');
 var url = require('url');
 const fs = require('fs');
 const fsExtra = require('fs-extra');
+const multer = require('multer');
 
 //include JS folder
 app.use(express.static(__dirname));
@@ -18,8 +19,8 @@ app.use(express.static(__dirname + '/css'));
 app.use(express.static(__dirname + '/sample'));
 
 //use json
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true })); 
+app.use(bodyParser.json({limit: '100mb', extended: true}));
+app.use(bodyParser.urlencoded({limit: '100mb', extended: true})); 
 
 // initialize cookie-parser to allow us access the cookies stored in the browser. 
 app.use(cookieParser());
@@ -78,6 +79,29 @@ app.get('/logout', (req,res) => {
 	res.redirect('/login');
 });
 
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads');
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  }
+});
+ 
+var upload = multer({ storage: storage });
+
+app.post('/upload_file', upload.single('myFile'), function (req, res, next) {
+	//find file with filename
+
+	//move file to host_id's folder
+	console.log('upload_file');
+	console.log(req.file);
+	console.log(req.body.host_id);
+	res.end();
+
+  // req.file is the `myFile` file
+  // req.body will hold the text fields, if there were any
+});
 
 //handle AJAX(post) calls 
 app.use(function (req, res, next) {
@@ -300,6 +324,8 @@ app.use(function (req, res, next) {
 		}
 	}
 });
+
+
 
 //start server: listen to port 3000!
 https.createServer({

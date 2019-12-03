@@ -466,6 +466,27 @@ function init_buttons(){
 		});
 	});
 
+	$('#file_input').change(function(e){
+		$('#host_id_input').val(sessionStorage.getItem('id'));
+
+		var form = $('#file_form')[0];
+        var formData = new FormData(form);
+
+		$.ajax({
+	        url:'/upload_file',
+	        processData: false,
+            contentType: false,
+	        type:'post',
+	        data:formData,
+	        enctype:'multipart/form-data'
+	    });
+	    $(this).val('');
+	});
+
+	$('#upload_btn').on('click',function(){
+		$('#file_input').click();
+	});
+
 	$('#logout_btn').on('click',function(){
 		sessionStorage.removeItem('id');
 		window.location.href = window.location.href.replace(window.location.pathname,'')+'/logout';
