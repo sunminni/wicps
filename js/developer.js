@@ -108,6 +108,25 @@ function save_codes(){
 
 }
 
+function chat_upload(){
+	$.ajax({
+		type: 'post',
+		url: '/chat_upload',
+		data: {	msg: chat_msg, 
+				timestamp: Date.now(),
+				id: sessionStorage.getItem('id'),
+				host_id: sessionStorage.getItem('id')},
+		success: function (result) {
+			if (result){
+				load_chat(result);
+			}
+			else{
+				console.log("upload fail.");
+			}
+		}
+	});
+}
+
 function init_animation(){
 	$.fn.extend({
 		animateCss: function(animationName, callback) {
@@ -205,22 +224,7 @@ $(document).ready(function(){
 			//send
 			var chat_msg = $(this).val();
 			if (chat_msg != ''){
-				$.ajax({
-					type: 'post',
-					url: '/chat_upload',
-					data: {	msg: chat_msg, 
-							timestamp: Date.now(),
-							id: sessionStorage.getItem('id'),
-							host_id: sessionStorage.getItem('id')},
-					success: function (result) {
-						if (result){
-							load_chat(result);
-						}
-						else{
-							console.log("upload fail.");
-						}
-					}
-				});
+				chat_upload(chat_msg);
 			}
 			$(this).val('');
 			return false;
@@ -458,15 +462,6 @@ function init_buttons(){
 		$.ajax({
 			type: 'post',
 			url: '/clear_chat',
-			data: {	host_id: sessionStorage.getItem('id')}
-		});
-	});
-
-	$('#upload_btn').on('click',function(){
-		$('.chat_log').html('');
-		$.ajax({
-			type: 'post',
-			url: '/file_upload',
 			data: {	host_id: sessionStorage.getItem('id')}
 		});
 	});
