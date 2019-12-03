@@ -45,12 +45,12 @@ app.use((req, res, next) => {
 	next();
 });
 
+// -- ROUTER START --
+
 // middleware function to check for logged-in users
 var sessionChecker = (req, res, next) => {
 	if (req.session.user && req.cookies.user_sid) {
-		//console.log(req.session.is_developer);
 		if (req.session.is_developer=='true'){
-			// console.log('developer');
 			res.sendFile(path.join(__dirname+'/developer.html'));
 		}
 		else{
@@ -61,7 +61,6 @@ var sessionChecker = (req, res, next) => {
 	}    
 };
 
-// route for Home-Page
 app.get('/', sessionChecker, (req, res) => {
 	res.redirect('/login');
 });
@@ -78,7 +77,10 @@ app.get('/logout', (req,res) => {
 	res.clearCookie('user_sid');
 	res.redirect('/login');
 });
+// -- ROUTER END --
 
+
+// -- FILE UPLOAD START --
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'uploads');
@@ -91,35 +93,38 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage });
 
 app.post('/upload_file', upload.single('myFile'), function (req, res, next) {
-	//find file with filename
-
-	//move file to host_id's folder
-	console.log('upload_file');
-	console.log(req.file);
-	console.log(req.body.host_id);
-	res.end();
-
-  // req.file is the `myFile` file
-  // req.body will hold the text fields, if there were any
+	//find file with filename and move file to host_id's folder
+	fsExtra.move('./uploads/'+req.file.originalname, './'+req.body.host_id+'/files/'+req.file.originalname, function (err) {
+		if (err) return console.error(err);
+		res.send(true);
+		res.end();
+	});
+	
 });
+// -- FILE UPLOAD END --
 
-//handle AJAX(post) calls 
+// -- FILE DOWNLOAD START --
+app.get('/download_file', function (req, res) {
+	res.download(__dirname+'/'+req.query.host_id+'/files/'+req.query.filename);
+});
+// -- FILE DOWNLOAD END --
+
+// -- AJAX (POST) HANDLER START --
 app.use(function (req, res, next) {
 	var url_parts = url.parse(req.url, true);
+	MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
+		if (err) throw err;
+		var dbo = db.db("mydb");
+		if (req.method == 'POST') {
+			switch (url_parts.pathname) {
+				case '/login':
+					var req_id = req.body.id;
+					var req_pw = req.body.password;
+					// do something
+					// console.log('client attempts to login');
+					// console.log('id: '+req_id);
+					// console.log('pw: '+req_pw);
 
-	if (req.method == 'POST') {
-		switch (url_parts.pathname) {
-			case '/login':
-				var req_id = req.body.id;
-				var req_pw = req.body.password;
-				// do something
-				// console.log('client attempts to login');
-				// console.log('id: '+req_id);
-				// console.log('pw: '+req_pw);
-
-				MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
-					if (err) throw err;
-					var dbo = db.db("mydb");
 					dbo.collection("userinfo").findOne(req.body,function(err, result) {
 						if (err) throw err;
 						if (result==null){
@@ -133,22 +138,17 @@ app.use(function (req, res, next) {
 							res.send(result);
 						}
 						res.end();
-						db.close();
 					});
-				});
-				break;
+					break;
 
-			case '/signup':
-				var req_id = req.body.id;
-				var req_pw = req.body.password;
-				// do something
-				// console.log('client attempts to signup');
-				// console.log('id: '+req_id);
-				// console.log('pw: '+req_pw);
+				case '/signup':
+					var req_id = req.body.id;
+					var req_pw = req.body.password;
+					// do something
+					// console.log('client attempts to signup');
+					// console.log('id: '+req_id);
+					// console.log('pw: '+req_pw);
 
-				MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
-					if (err) throw err;
-					var dbo = db.db("mydb");
 					dbo.collection("userinfo").findOne({id: req_id},function(err, result) {
 						if (err) throw err;
 						if (result==null){
@@ -157,7 +157,6 @@ app.use(function (req, res, next) {
 								console.log("Sign up success!");
 								res.send(true);
 								res.end();
-								db.close();
 							});
 
 						}
@@ -165,15 +164,10 @@ app.use(function (req, res, next) {
 							console.log("Sign up failed.");
 							res.send(false);
 							res.end();
-							db.close();
 						}
 					});
-				});
-				break;
-			case '/save':
-				MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
-					if (err) throw err;
-					var dbo = db.db("mydb");
+					break;
+				case '/save':
 					dbo.collection("versions").insertOne(req.body,function(err, result) {
 						if (err) throw err;
 						if (result.result.ok){
@@ -185,59 +179,43 @@ app.use(function (req, res, next) {
 							res.send(false);
 						}
 						res.end();
-						db.close();
 					});
-				});
-				break;
-			case '/load':
-				MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
-					if (err) throw err;
-					var dbo = db.db("mydb");
+					break;
+				case '/load':
 					dbo.collection("versions").find(req.body).toArray(function(err, result) {
 						if (err) throw err;
 						console.log("Load success!");
 						// console.log(result);
 						res.send(result);
 						res.end();
-						db.close();
 					});
-				});
-				break;
-			case '/upload':
-				//create or overwrite files
-				if (!fs.existsSync(req.body.id)){
-				    fs.mkdirSync(req.body.id);
-				}
-				fsExtra.emptyDirSync(req.body.id);
+					break;
+				case '/upload':
+					//create or overwrite files
+					if (!fs.existsSync(req.body.id)){
+					    fs.mkdirSync(req.body.id);
+					}
+					fsExtra.emptyDirSync(req.body.id);
 
-				MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
-					if (err) throw err;
-					var dbo = db.db("mydb");
 					dbo.collection("userinfo").updateOne({id:req.body.id},{$set: {html_filename: req.body.html_filename}},{upsert:true});
-				});
-				
 
-				fs.writeFile(req.body.id+'/'+req.body.html_filename, req.body.html, (err) => {
-					if (err) throw err;
-					// console.log('html saved!');
-					fs.writeFile(req.body.id+'/'+req.body.css_filename, req.body.css, (err) => {
+					fs.writeFile(req.body.id+'/'+req.body.html_filename, req.body.html, (err) => {
 						if (err) throw err;
-						// console.log('css saved!');
-						fs.writeFile(req.body.id+'/'+req.body.js_filename, req.body.js, (err) => {
+						// console.log('html saved!');
+						fs.writeFile(req.body.id+'/'+req.body.css_filename, req.body.css, (err) => {
 							if (err) throw err;
-							// console.log('js saved!');
-							console.log('html, css, js saved!');
-							res.send(true);
-							res.end();
+							// console.log('css saved!');
+							fs.writeFile(req.body.id+'/'+req.body.js_filename, req.body.js, (err) => {
+								if (err) throw err;
+								// console.log('js saved!');
+								console.log('html, css, js saved!');
+								res.send(true);
+								res.end();
+							});
 						});
 					});
-				});
-				break;
-			case '/add_friend':
-				MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
-					if (err) throw err;
-					var dbo = db.db("mydb");
-					//console.log(req.body.pc);
+					break;
+				case '/add_friend':
 					dbo.collection("userinfo").findOne({id:req.body.friend_id},function(err, result) {
 						if (err) throw err;
 						if (result==null){
@@ -252,12 +230,8 @@ app.use(function (req, res, next) {
 							dbo.collection("add_requests").updateOne(query,{$set: req.body},{upsert:true});
 						}
 					});
-				});
-				break;
-			case '/chat_upload':
-				MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
-					if (err) throw err;
-					var dbo = db.db("mydb");
+					break;
+				case '/chat_upload':
 					dbo.collection("chat_log").insertOne(req.body,function(err, result) {
 						if (err) throw err;
 						if (req.body.msg == '(exited the chatroom)'){
@@ -275,13 +249,8 @@ app.use(function (req, res, next) {
 							res.end();
 						}
 					});
-					
-				});
-				break;
-			case '/chat_download':
-				MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
-					if (err) throw err;
-					var dbo = db.db("mydb");
+					break;
+				case '/chat_download':
 					dbo.collection("chat_log").find(req.body).toArray(function(err, result) {
 						if (err) throw err;
 						dbo.collection("userinfo").findOne({'id':req.body.host_id},function(err2, result2) {
@@ -293,13 +262,8 @@ app.use(function (req, res, next) {
 							}
 						});
 					});
-				});
-				break;
-			case '/check_request':
-				MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
-					if (err) throw err;
-					var dbo = db.db("mydb");
-
+					break;
+				case '/check_request':
 					dbo.collection("add_requests").findOne({friend_id:req.body.id},function(err, result) {
 						if (err) throw err;
 
@@ -312,22 +276,32 @@ app.use(function (req, res, next) {
 							res.send(result);
 						}
 					});
-				});
-				break;
-			case '/clear_chat':
-				MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
-					if (err) throw err;
-					var dbo = db.db("mydb");
+					break;
+				case '/clear_chat':
 					dbo.collection("chat_log").deleteMany({host_id:req.body.host_id});
-				});
-				break;
+					break;
+				case '/load_files':
+					var files_list = fs.readdir('./'+req.body.host_id+'/files',function(err,result){
+						if (err) throw err;
+						res.send(result);
+						res.end();
+					});
+					break;
+				case '/delete_file':
+					fs.unlink(__dirname+'/'+req.body.host_id+'/files/'+req.body.filename,function(err,result){
+						if (err) throw err;
+						res.send(true);
+						res.end();
+					});
+					break;
+			}
 		}
-	}
+	});
 });
+// -- AJAX (POST) HANDLER END --
 
 
-
-//start server: listen to port 3000!
+// -- INITIALIZE SERVER START --
 https.createServer({
     key: fs.readFileSync('./key.pem'),
     cert: fs.readFileSync('./cert.pem'),
@@ -335,3 +309,5 @@ https.createServer({
 },app).listen(process.env.port || 3000);
 
 console.log('Running at Port 3000');
+// -- INITIALIZE SERVER END --
+

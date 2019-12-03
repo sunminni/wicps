@@ -39,7 +39,7 @@ function load_codes(){
 		success: function (result) {
 			if (result){
 				console.log("load success!");
-				codes = result;
+				g_codes = result;
 				$('#versions').html('');
 				result.forEach(function(e){
 					var a  = new Date(0);
@@ -69,10 +69,47 @@ function load_codes(){
 	});
 }
 
+function load_files(){
+	$.ajax({
+		type: 'post',
+		url: '/load_files',
+		data: {host_id: sessionStorage.getItem('id')},
+		success: function (result) {
+			if (result){
+				console.log("files load success!");
+				$('.file_row').remove();
+				result.forEach(function(e){
+					if (e.charAt(0)!='.'){
+						$('#files_section').prepend('<div class="file_row"><div class="delete_file_btn">X</div><div class="filename_div">'+e+'</div></div>')
+					}
+				});
+
+				$('.filename_div').on('click',function(){
+					window.open('/download_file?host_id='+sessionStorage.getItem('id')+'&filename='+$(this).html());
+				});
+				$('.delete_file_btn').on('click',function(){
+					$.ajax({
+						type: 'post',
+						url: '/delete_file',
+						data: {	host_id: sessionStorage.getItem('id'),
+								filename: $(this).parent().find('.filename_div').html()},
+						success: function (result) {
+							load_files();
+						}
+					});
+				});
+			}
+			else{
+				console.log("load fail.");
+			}
+		}
+	});
+}
+
 function display_one(){
 	var timestamp = $('.timestamp.selected').attr('timestamp');
 	
-	let one  = codes.find(e => e.timestamp === timestamp);
+	let one  = g_codes.find(e => e.timestamp === timestamp);
 	$('#filename_html').text(one.html_filename);
 	$('#filename_css').text(one.css_filename);
 	$('#filename_js').text(one.js_filename);
@@ -319,6 +356,9 @@ function init_buttons(){
 	var left = $('#load_btn').offset().left + $('#load_btn').outerWidth()/2 - $('#versions').outerWidth()/2;
 	$('#versions').css('left',left);
 	$('#load_btn').on('click',function(){
+		if ($('#file_btn').hasClass('clicked')){
+			$('#file_btn').click();
+		}
 		if ($(this).hasClass('clicked')){
 			if (!$('#versions').hasClass('animated')){
 				$(this).removeClass('clicked');
@@ -478,13 +518,37 @@ function init_buttons(){
             contentType: false,
 	        type:'post',
 	        data:formData,
-	        enctype:'multipart/form-data'
+	        enctype:'multipart/form-data',
+	        success: function(result){
+	        	load_files();
+	        }
 	    });
 	    $(this).val('');
 	});
 
 	$('#upload_btn').on('click',function(){
 		$('#file_input').click();
+	});
+
+	$('#file_btn').on('click',function(){
+		if ($('#load_btn').hasClass('clicked')){
+			$('#load_btn').click();
+		}
+		if (!$('#files_div').hasClass('animated')){
+			$(this).toggleClass('clicked');
+			if ($(this).hasClass('clicked')){
+				load_files();
+				$('#files_div').css('display','block');
+				$('#files_div').animateCss('slideInRight',function(){
+				});
+			}
+			else{
+				$('#files_div').css('display','block');
+				$('#files_div').animateCss('slideOutRight',function(){
+					$('#files_div').css('display','none');
+				});
+			}
+		}
 	});
 
 	$('#logout_btn').on('click',function(){
