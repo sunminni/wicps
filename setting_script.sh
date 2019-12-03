@@ -4,6 +4,9 @@
 
 
 # Installing MongoDB (https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/) ---------------------------------------------------------------
+echo
+echo "WICPS: Install and start MongoDB..."
+echo
 
 # Import the public key used by the package management system.
 wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -
@@ -30,12 +33,21 @@ sudo service mongod start
 # Verify that MongoDB has started successfully
 sudo service mongod status
 
+echo
+echo "WICPS: MongoDB has been installed and started!"
+echo
 # --------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Install nodejs
-sudo apt-get install nodejs
+echo
+echo "WICPS: Install Node.js (for Ubuntu)..."
+echo
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+sudo apt-get install -y nodejs
 
-# Install npm
-sudo apt-get install npm
+echo
+echo "WICPS: Node.js has been installed!"
+echo
+
 
 
