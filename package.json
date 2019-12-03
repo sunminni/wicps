@@ -15,5 +15,29 @@
   "bugs": {
     "url": "https://github.com/sunminni/wicps/issues"
   },
-  "homepage": "https://github.com/sunminni/wicps#readme"
+  "homepage": "https://github.com/sunminni/wicps#readme",
+  "dependencies": {
+    "body-parser": "1.19.0",
+    "bytes": "3.1.0",
+    "content-type": "1.0.4",
+    "debug": "2.6.9",
+    "depd": "1.1.2",
+    "ee-first": "1.1.1",
+    "http-errors": "1.7.2",
+    "iconv-lite": "0.4.24",
+    "inherits": "2.0.3",
+    "media-typer": "0.3.0",
+    "mime-db": "1.40.0",
+    "mime-types": "2.1.24",
+    "ms": "2.0.0",
+    "on-finished": "2.3.0",
+    "qs": "6.7.0",
+    "raw-body": "2.4.0",
+    "safer-buffer": "2.1.2",
+    "setprototypeof": "1.1.1",
+    "statuses": "1.5.0",
+    "toidentifier": "1.0.0",
+    "type-is": "1.6.18",
+    "unpipe": "1.0.0"
+  }
 }
