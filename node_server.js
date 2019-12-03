@@ -7,7 +7,6 @@ const path = require('path');
 var MongoClient = require('mongodb').MongoClient;
 var DB_URL = "mongodb://localhost:27017/";
 var https = require('https');
-var http = require('http');
 var url = require('url');
 const fs = require('fs');
 const fsExtra = require('fs-extra');
@@ -83,7 +82,6 @@ app.get('/logout', (req,res) => {
 //handle AJAX(post) calls 
 app.use(function (req, res, next) {
 	var url_parts = url.parse(req.url, true);
-    //console.log("*** URL: " + req.url);
 
 	if (req.method == 'POST') {
 		switch (url_parts.pathname) {
@@ -91,9 +89,9 @@ app.use(function (req, res, next) {
 				var req_id = req.body.id;
 				var req_pw = req.body.password;
 				// do something
-				 console.log('client attempts to login');
-				 console.log('id: '+req_id);
-				 console.log('pw: '+req_pw);
+				// console.log('client attempts to login');
+				// console.log('id: '+req_id);
+				// console.log('pw: '+req_pw);
 
 				MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
 					if (err) throw err;
@@ -299,47 +297,15 @@ app.use(function (req, res, next) {
 					dbo.collection("chat_log").deleteMany({host_id:req.body.host_id});
 				});
 				break;
-            case '/file_upload':
-				console.log('File upload starts!');
-                console.log('req: ' + req.body);
-				var multer = require('multer');
-				const storage = multer.diskStorage({
-					destination: (req, file, cb) => {
-					  cb(null, './uploads');
-					},
-					filename: (req, file, cb) => {
-					  cb(null, `${Date.now()}-${file.originalname}`);
-					}
-				});
-				
-				const upload = multer({storage});
-				
-				//app.get('/', (req, res) => res.sendFile(path.join(__dirname+'/index.html')));
-                res.sendFile(path.join(__dirname+'/developer.html'));
-			    upload.single('file');	
-                
-				//app.post('/fileUpload', upload.single('file'), (req, res) => {
-			    //		res.send('file uploaded');
-				//});
-                break;
 		}
 	}
 });
 
-var privateKey  = fs.readFileSync('./keys/key.pem');
-var certificate = fs.readFileSync('./keys/cert.pem');
-var credentials = {key: privateKey, cert: certificate};
-var httpsServer = https.createServer(credentials, app);
-
-
-var httpServer = http.createServer(app);
-httpsServer.listen(3000);
-
 //start server: listen to port 3000!
-//https.createServer({
-//    key: fs.readFileSync('./key.pem'),
-//    cert: fs.readFileSync('./cert.pem'),
-    //passphrase: 'asdfasdf'
-//},app).listen(process.env.port || 3000);
+https.createServer({
+    key: fs.readFileSync('./key.pem'),
+    cert: fs.readFileSync('./cert.pem'),
+    passphrase: 'asdfasdf'
+},app).listen(process.env.port || 3000);
 
 console.log('Running at Port 3000');
