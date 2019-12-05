@@ -10,6 +10,7 @@ var mediaStream;
 function initPeerJS(){
 	navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(function(MS){
 		mediaStream = MS;
+		mediaStream.getAudioTracks()[0].enabled = false;
 	});
 
 	peer = new Peer({key: 'lwjd5qra8257b9'});
@@ -577,10 +578,17 @@ function init_buttons(){
 	// });
 	$('#mic_btn').on('click',function(){
 		$(this).toggleClass('clicked');
+		mediaStream.getAudioTracks()[0].enabled = $(this).hasClass('clicked');
 	});
 
 	$('#speaker_btn').on('click',function(){
 		$(this).toggleClass('clicked');
+		if($(this).hasClass('clicked')){
+			$('#remoteVideo')[0].play();
+		}
+		else{
+			$('#remoteVideo')[0].pause();
+		}
 	});
 
 	$('#reload_btn').on('click',function(){
@@ -622,13 +630,13 @@ function init_buttons(){
 			}
 		}
 	});
-	
+
 	$('#upload_btn').on('click',function(){
 		$('#file_input').click();
 	});
 
 	$('#file_input').change(function(e){
-		$('#host_id_input').val(sessionStorage.getItem('id'));
+		$('#host_id_input').val(sessionStorage.getItem('host_id'));
 
 		var form = $('#file_form')[0];
         var formData = new FormData(form);

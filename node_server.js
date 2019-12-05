@@ -243,6 +243,12 @@ MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
 						if (err) throw err;
 						if (req.body.msg == '(exited the chatroom)'){
 							dbo.collection("add_requests").deleteOne({friend_id:req.body.id});
+							dbo.collection("userinfo").findOne({id: req.body.host_id},function(err2,result2){
+								if (err2) throw err2;
+								var room_info = result2.room;
+								delete room_info[req.body.id];
+								dbo.collection("userinfo").updateOne({id: req.body.host_id},{$set: {room: room_info}},{upsert:true});
+							});
 						}
 						if (result.result.ok){
 							dbo.collection("chat_log").find({host_id:req.body.host_id}).toArray(function(err, result) {
@@ -260,7 +266,7 @@ MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
 				case '/chat_download':
 					dbo.collection("chat_log").find(req.body).toArray(function(err, result) {
 						if (err) throw err;
-						dbo.collection("userinfo").findOne({'id':req.body.host_id},function(err2, result2) {
+						dbo.collection("userinfo").findOne({id:req.body.host_id},function(err2, result2) {
 							if (err2) throw err2;
 							if (result2!=null){
 								res.send(result.concat([result2.html_filename]).concat([result2.room]).concat([{host_mic:result2.host_mic,host_speaker:result2.host_speaker}]));

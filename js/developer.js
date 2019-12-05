@@ -10,7 +10,9 @@ var mediaStream;
 function initPeerJS(){
 	navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(function(MS){
 		mediaStream = MS;
+		mediaStream.getAudioTracks()[0].enabled = false;
 	});
+
 	peer = new Peer({key: 'lwjd5qra8257b9'});
 	peer.on('open', function(peer_id) {
 		console.log('My peer ID is: ' + peer_id);
@@ -571,9 +573,16 @@ function init_buttons(){
 	});
 	$('#mic_btn').on('click',function(){
 		$(this).toggleClass('clicked');
+		mediaStream.getAudioTracks()[0].enabled = $(this).hasClass('clicked');
 	});
 	$('#speaker_btn').on('click',function(){
 		$(this).toggleClass('clicked');
+		if($(this).hasClass('clicked')){
+			$('#localVideo')[0].play();
+		}
+		else{
+			$('#localVideo')[0].pause();
+		}
 	});
 	$('#file_btn').on('click',function(){
 		if ($('#load_btn').hasClass('clicked')){
