@@ -291,6 +291,7 @@ MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
 								room_info[req.body.id] = {member_mic: false, member_speaker: false};
 								dbo.collection("userinfo").updateOne({id: result.host_id},{$set: {room: room_info}},{upsert:true});
 							});
+							dbo.collection("add_requests").deleteOne({friend_id:req.body.id});
 							res.send(result);
 						}
 						res.end();
