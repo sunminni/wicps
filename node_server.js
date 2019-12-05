@@ -110,10 +110,10 @@ app.get('/download_file', function (req, res) {
 // -- FILE DOWNLOAD END --
 
 // -- AJAX (POST) HANDLER START --
-MongoClient.connect(DB_URL, function(err, db) {
+MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
 	if (err) throw err;
 	var dbo = db.db("mydb");
-	
+
 	app.use(function (req, res, next) {
 		var url_parts = url.parse(req.url, true);
 	
