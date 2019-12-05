@@ -301,7 +301,11 @@ MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
 					res.end();
 					break;
 				case '/load_files':
-					var files_list = fs.readdir('./'+req.body.host_id+'/files',function(err,result){
+					var dir_path = './'+req.body.host_id+'/files';
+					if (!fs.existsSync(dir_path)){
+					    fs.mkdirSync(dir_path);
+					}
+					var files_list = fs.readdir(dir_path,function(err,result){
 						if (err) throw err;
 						res.send(result);
 						res.end();
