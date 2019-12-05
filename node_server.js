@@ -110,11 +110,13 @@ app.get('/download_file', function (req, res) {
 // -- FILE DOWNLOAD END --
 
 // -- AJAX (POST) HANDLER START --
-app.use(function (req, res, next) {
-	var url_parts = url.parse(req.url, true);
-	MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
-		if (err) throw err;
-		var dbo = db.db("mydb");
+MongoClient.connect(DB_URL, function(err, db) {
+	if (err) throw err;
+	var dbo = db.db("mydb");
+	
+	app.use(function (req, res, next) {
+		var url_parts = url.parse(req.url, true);
+	
 		if (req.method == 'POST') {
 			switch (url_parts.pathname) {
 				case '/login':
@@ -144,6 +146,10 @@ app.use(function (req, res, next) {
 				case '/signup':
 					var req_id = req.body.id;
 					var req_pw = req.body.password;
+					var req_body = req.body;
+					if (req.body.is_developer=='true'){
+						req_body.room = {};
+					}
 					// do something
 					// console.log('client attempts to signup');
 					// console.log('id: '+req_id);
@@ -152,12 +158,12 @@ app.use(function (req, res, next) {
 					dbo.collection("userinfo").findOne({id: req_id},function(err, result) {
 						if (err) throw err;
 						if (result==null){
-							dbo.collection("userinfo").insertOne(req.body,function(err, result) {
+							dbo.collection("userinfo").insertOne(req_body,function(err, result) {
 								if (err) throw err;
 								console.log("Sign up success!");
 								res.send(true);
-								res.end();
 							});
+							res.end();
 
 						}
 						else{
@@ -229,6 +235,7 @@ app.use(function (req, res, next) {
 											friend_id: req.body.friend_id};
 							dbo.collection("add_requests").updateOne(query,{$set: req.body},{upsert:true});
 						}
+						res.end();
 					});
 					break;
 				case '/chat_upload':
@@ -256,9 +263,8 @@ app.use(function (req, res, next) {
 						dbo.collection("userinfo").findOne({'id':req.body.host_id},function(err2, result2) {
 							if (err2) throw err2;
 							if (result2!=null){
-								res.send(result.concat([result2.html_filename]));
+								res.send(result.concat([result2.html_filename]).concat([result2.room]).concat([{host_mic:result2.host_mic,host_speaker:result2.host_speaker}]));
 								res.end();
-								db.close();
 							}
 						});
 					});
@@ -273,12 +279,20 @@ app.use(function (req, res, next) {
 						}
 						else{
 							//request exists
+							dbo.collection("userinfo").findOne({id:result.host_id},function(err, result2) {
+								if (err) throw err;
+								var room_info = result2.room;
+								room_info[req.body.id] = {member_mic: false, member_speaker: false};
+								dbo.collection("userinfo").updateOne({id: result.host_id},{$set: {room: room_info}},{upsert:true});
+							});
 							res.send(result);
 						}
+						res.end();
 					});
 					break;
 				case '/clear_chat':
 					dbo.collection("chat_log").deleteMany({host_id:req.body.host_id});
+					res.end();
 					break;
 				case '/load_files':
 					var files_list = fs.readdir('./'+req.body.host_id+'/files',function(err,result){
@@ -293,6 +307,22 @@ app.use(function (req, res, next) {
 						res.send(true);
 						res.end();
 					});
+					break;
+				case '/set_status':
+					if(req.body.is_developer=='true'){
+						dbo.collection("userinfo").updateOne({id: req.body.host_id},{$set: {host_mic: req.body.host_mic, host_speaker: req.body.host_speaker}},{upsert:true});
+					}
+					else{
+						dbo.collection("userinfo").findOne({id:req.body.host_id},function(err, result) {
+							if (err) throw err;
+							if(req.body.member_id != undefined){
+								var room_info = result.room;
+								room_info[req.body.member_id] = {member_mic: req.body.member_mic, member_speaker: req.body.member_speaker};
+								dbo.collection("userinfo").updateOne({id: req.body.host_id},{$set: {room: room_info}},{upsert:true});
+							}
+						});
+					}
+					res.end();
 					break;
 			}
 		}

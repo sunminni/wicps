@@ -145,7 +145,7 @@ function save_codes(){
 
 }
 
-function chat_upload(){
+function chat_upload(chat_msg){
 	$.ajax({
 		type: 'post',
 		url: '/chat_upload',
@@ -278,41 +278,81 @@ $(document).ready(function(){
 
 
 function readChatTimer(){
-	var i = 0;
 	loadingTimer = setInterval(function(){
 		$.ajax({
 			type: 'post',
 			url: '/chat_download',
 			data: {	host_id: sessionStorage.getItem('host_id') },
 			success: function (result) {
-				console.log(result);
 				if (result){
-					load_chat(result);
+					var chat_results = result.slice(0,result.length-3);
+					var html_filename = result.slice(result.length-3,result.length-2)[0];
+					var room = result.slice(result.length-2,result.length-1)[0];
+					var host_status = result.slice(result.length-1,result.length)[0];
+
+					$('.room_info').html('');
+					var host_mic = "<div class='mic_icon'>🎤</div>";
+					var host_speaker = "<div class='speaker_icon'>🔈</div>";
+
+					if(host_status.host_mic=='true'){
+						host_mic = "<div class='mic_icon on'>🎤</div>";
+					}
+					if(host_status.host_speaker=='true'){
+						host_speaker = "<div class='speaker_icon on'>🔈</div>";
+					}
+					var host_div = $("<div class='host_info'>"+sessionStorage.getItem('host_id')+host_mic+host_speaker+"</div>");
+					$('.room_info').append(host_div);
+					for (member in room){
+						var mic = "<div class='mic_icon'>🎤</div>";
+						var speaker = "<div class='speaker_icon'>🔈</div>";
+						if(room[member]['member_mic']=='true'){
+							mic = "<div class='mic_icon on'>🎤</div>";
+						}
+						if(room[member]['member_speaker']=='true'){
+							speaker = "<div class='speaker_icon on'>🔈</div>";
+						}
+						var member_div = $("<div class='member_info'><div class='member_id'>"+member+"</div>"+mic+speaker+"</div>");
+						$('.room_info').append(member_div);
+					}
+
+					sessionStorage.setItem('html_filename',html_filename);
+					load_chat(chat_results);
 				}
 				else{
 					console.log("chat read fail.");
 				}
 			}
 		});
+
+		$.ajax({
+			type: 'post',
+			url: '/set_status',
+			data: {	is_developer: true,
+					host_id: sessionStorage.getItem('host_id'),
+					host_mic: $('#mic_btn').hasClass('clicked'),
+					host_speaker: $('#speaker_btn').hasClass('clicked')}
+		});
+
 	},1000);
 }
 
 function load_chat(result){
 	if (result.length>0){
-		if (sessionStorage.getItem('chat_timestamp')==null||sessionStorage.getItem('chat_timestamp')!=result[result.length-2].timestamp){
+		if (sessionStorage.getItem('chat_timestamp')==null||sessionStorage.getItem('chat_timestamp')!=result[result.length-1].timestamp){
 			$('.chat_log').html('');
 			result.forEach(function(e,i,array){
-				if (i!=array.length-1){
-					var a  = new Date(0);
-					a.setUTCMilliseconds(e.timestamp);
-					var options = {hour:'2-digit', minute:'2-digit'};
-					var dateString = a.toLocaleString('en-US',options);
-					$('.chat_log').append('<div class="single_chat"><div class="ID">'+e.id+'</div><div class="time_stamp">'+dateString+'</div><div class="msg">'+e.msg+'</div></div>');
-					$(".chat_log").scrollTop($(".chat_log")[0].scrollHeight);
-				}
+				var a  = new Date(0);
+				a.setUTCMilliseconds(e.timestamp);
+				var options = {hour:'2-digit', minute:'2-digit'};
+				var dateString = a.toLocaleString('en-US',options);
+				$('.chat_log').append('<div class="single_chat"><div class="ID">'+e.id+'</div><div class="time_stamp">'+dateString+'</div><div class="msg">'+e.msg+'</div></div>');
+				$(".chat_log").scrollTop($(".chat_log")[0].scrollHeight);
 			});
-			sessionStorage.setItem('chat_timestamp',result[result.length-2].timestamp);
+			sessionStorage.setItem('chat_timestamp',result[result.length-1].timestamp);
 		}
+	}
+	else{
+		$('.chat_log').html('');
 	}
 }
 
@@ -529,7 +569,12 @@ function init_buttons(){
 	$('#upload_btn').on('click',function(){
 		$('#file_input').click();
 	});
-
+	$('#mic_btn').on('click',function(){
+		$(this).toggleClass('clicked');
+	});
+	$('#speaker_btn').on('click',function(){
+		$(this).toggleClass('clicked');
+	});
 	$('#file_btn').on('click',function(){
 		if ($('#load_btn').hasClass('clicked')){
 			$('#load_btn').click();

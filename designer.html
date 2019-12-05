@@ -30,6 +30,10 @@
 		<div id='logout_btn' class='btn'>LOGOUT</div>
 	</div>
 	<div id='versions'></div>
+	<div id='files_div'>
+		<div id='files_section'></div>
+		<div id='upload_btn'>UPLOAD FILE</div>
+	</div>
 
 	<div class='waiting'></div>
     
@@ -52,14 +56,18 @@
 	<div class='chatting'>
 		<div class='chatting_placeholder'></div>
 		<div class='controls'>
-			<div id='upload_btn' class='btn'>FILES</div>
+			<div id='file_btn' class='btn'>FILES</div>
 			<div id='mic_btn' class='btn'>MIC</div>
 			<div id='speaker_btn' class='btn'>SPEAKER</div>
 		</div>
+		<div class='room_info'></div>
 		<div id='exit_btn'>Exit Chat</div>
 		<div class='chat_log_designer'></div>
 		<textarea class='chat_input'></textarea>
 	</div>
-
+	<form id='file_form' method="post" enctype='multipart/form-data' hidden>
+		<input type='file' name='myFile' id='file_input' />
+		<input type='text' name='host_id' id='host_id_input' />
+	</form>
 </body>
 </html>
