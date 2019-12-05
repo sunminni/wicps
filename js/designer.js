@@ -293,8 +293,12 @@ function init_buttons(){
 	});
 
 	$('#logout_btn').on('click',function(){
-		chat_upload('(exited the chatroom)');
-		window.location.href = window.location.href.replace(window.location.pathname,'')+'/logout';
+		if($('#chat_btn').hasClass('clicked')){
+			$('#exit_btn').click();
+		}
+		else{
+			window.location.href = window.location.href.replace(window.location.pathname,'')+'/logout';
+		}
 	});
 
 	$('#exit_btn').on('click',function(){

@@ -503,25 +503,40 @@ function init_buttons(){
 				$(this).remove();
 			}
 			else if (friend_id!=''){
-				$.ajax({
-					type: 'post',
-					url: '/add_friend',
-					data: {	host_id: sessionStorage.getItem('id'),
-							friend_id: friend_id,
-							peer_id: sessionStorage.getItem('peer_id')},
-					success: function (result) {
-						if (result){
-							$('.add_friend_input').after('<div style="color:white" class="message">(Invitation sent)</div>');
-						}
-						else{
-							$('.add_friend_input').after('<div style="color:red" class="message">(ID does not exist)</div>');
-						}
-						setTimeout(function(){
-							$('.message').remove();
-						},2000);
-						$('.add_friend_input').remove();
+				var in_this_room = false;
+				$('.member_id').each(function(e){
+					if($(this).html()==friend_id){
+						in_this_room = true;
 					}
 				});
+				if(in_this_room){
+					$(this).after('<div style="color:red" class="message">(Already in this room)</div>');
+					setTimeout(function(){
+						$('.message').remove();
+					},2000);
+					$(this).remove();
+				}
+				else{
+					$.ajax({
+						type: 'post',
+						url: '/add_friend',
+						data: {	host_id: sessionStorage.getItem('id'),
+								friend_id: friend_id,
+								peer_id: sessionStorage.getItem('peer_id')},
+						success: function (result) {
+							if (result){
+								$('.add_friend_input').after('<div style="color:white" class="message">(Invitation sent)</div>');
+							}
+							else{
+								$('.add_friend_input').after('<div style="color:red" class="message">(ID does not exist)</div>');
+							}
+							setTimeout(function(){
+								$('.message').remove();
+							},2000);
+							$('.add_friend_input').remove();
+						}
+					});
+				}
 			}
 			else{
 				$(this).remove();
