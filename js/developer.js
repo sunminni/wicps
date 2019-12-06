@@ -4,7 +4,7 @@ var js_CodeMirror;
 
 var codes;
 var loadingTimer;
-var peer;
+var peer_list = ['','','',''];
 var mediaStream;
 
 function initPeerJS(){
@@ -12,22 +12,6 @@ function initPeerJS(){
 		mediaStream = MS;
 		mediaStream.getAudioTracks()[0].enabled = false;
 	});
-
-	peer = new Peer({key: 'lwjd5qra8257b9'});
-	peer.on('open', function(peer_id) {
-		console.log('My peer ID is: ' + peer_id);
-		sessionStorage.setItem('peer_id',peer_id);
-	});
-	peer.on('call', function(call) {
-		console.log('answered!');
-		call.answer(mediaStream);
-		
-		call.on('stream', function(stream) {
-			video = $('#localVideo')[0];
-			video.srcObject = stream;
-		});
-	});
-	
 }
 
 function load_codes(){
@@ -517,25 +501,39 @@ function init_buttons(){
 					$(this).remove();
 				}
 				else{
-					$.ajax({
-						type: 'post',
-						url: '/add_friend',
-						data: {	host_id: sessionStorage.getItem('id'),
-								friend_id: friend_id,
-								peer_id: sessionStorage.getItem('peer_id')},
-						success: function (result) {
-							if (result){
-								$('.add_friend_input').after('<div style="color:white" class="message">(Invitation sent)</div>');
+					peer_list[$('.member_id').length] = new Peer({key: 'lwjd5qra8257b9'});
+					peer_list[$('.member_id').length].on('open', function(peer_id) {
+						console.log('My peer ID is: ' + peer_id);
+						$.ajax({
+							type: 'post',
+							url: '/add_friend',
+							data: {	host_id: sessionStorage.getItem('id'),
+									friend_id: friend_id,
+									peer_id: peer_id},
+							success: function (result) {
+								if (result){
+									$('.add_friend_input').after('<div style="color:white" class="message">(Invitation sent)</div>');
+								}
+								else{
+									$('.add_friend_input').after('<div style="color:red" class="message">(ID does not exist)</div>');
+								}
+								setTimeout(function(){
+									$('.message').remove();
+								},2000);
+								$('.add_friend_input').remove();
 							}
-							else{
-								$('.add_friend_input').after('<div style="color:red" class="message">(ID does not exist)</div>');
-							}
-							setTimeout(function(){
-								$('.message').remove();
-							},2000);
-							$('.add_friend_input').remove();
-						}
+						});
 					});
+					peer_list[$('.member_id').length].on('call', function(call) {
+						console.log('answered!');
+						call.answer(mediaStream);
+						
+						call.on('stream', function(stream) {
+							video = $('#localVideo'+($('.member_id').length+1))[0];
+							video.srcObject = stream;
+						});
+					});
+					
 				}
 			}
 			else{
@@ -593,10 +591,16 @@ function init_buttons(){
 	$('#speaker_btn').on('click',function(){
 		$(this).toggleClass('clicked');
 		if($(this).hasClass('clicked')){
-			$('#localVideo')[0].play();
+			$('#localVideo1')[0].play();
+			$('#localVideo2')[0].play();
+			$('#localVideo3')[0].play();
+			$('#localVideo4')[0].play();
 		}
 		else{
-			$('#localVideo')[0].pause();
+			$('#localVideo1')[0].pause();
+			$('#localVideo2')[0].pause();
+			$('#localVideo3')[0].pause();
+			$('#localVideo4')[0].pause();
 		}
 	});
 	$('#file_btn').on('click',function(){
