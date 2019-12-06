@@ -162,9 +162,8 @@ MongoClient.connect(DB_URL, { useUnifiedTopology: true }, function(err, db) {
 								if (err) throw err;
 								console.log("Sign up success!");
 								res.send(true);
+								res.end();
 							});
-							res.end();
-
 						}
 						else{
 							console.log("Sign up failed.");
